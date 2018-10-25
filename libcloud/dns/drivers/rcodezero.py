@@ -151,6 +151,8 @@ class RcodeZeroDriver(DNSDriver):
         :param data: Data for the record (depends on the record type).
         :type  data: ``str``
 
+        :param extra: Extra attributes: ttl and disabled 
+        tpye   extra: ``dict``
 
         :rtype: :class:`Record`
         """
@@ -226,15 +228,14 @@ class RcodeZeroDriver(DNSDriver):
         :param type: Zone type (master / slave).
         :type  type: ``str``
 
-        :param ttl: TTL for new records. (optional)
+        :param ttl: not supported. RcodeZero support TTLs per RRSet
         :type  ttl: ``int``
 
-        :param extra: Extra attributes (driver specific). (optional)
+        :param extra: Extra attributes. (optional)
                       For example, specify
-                      ``extra={'masters': ['193.0.2.2','2001:db8::2']}`` to set
+                      ``extra=eval('{'masters': ['193.0.2.2','2001:db8::2']}')`` to set
                       the Master nameservers for a type=slave zone.
         :type extra: ``dict``
-        :type  extra: ``dict``
 
         :rtype: :class:`Zone`
         """
@@ -289,7 +290,7 @@ class RcodeZeroDriver(DNSDriver):
 
     def delete_zone(self, zone):
         """
-        Use this method to delete a zone.
+        Deletes a zone.
 
         :param zone: zone to delete
         :type zone: `Zone`
@@ -376,8 +377,8 @@ class RcodeZeroDriver(DNSDriver):
         :param data: Data for the record (depends on the record type).
         :type  data: ``str``
 
-        :param extra: (optional) Extra attributes (driver specific).
-        :type  extra: ``dict``
+        :param extra: Extra attributes: ttl and disabled (optional)
+        :type   extra: ``dict``
 
         :rtype: :class:`Record`
         """
@@ -385,7 +386,7 @@ class RcodeZeroDriver(DNSDriver):
         action = '%s/zones/%s/rrsets' % (self.api_root, record.zone.id)
 
         payload = self._to_patchrequest(
-            record.zone.id, None, name, type, data, record.extra, 'update')
+            record.zone.id, record, name, type, data, record.extra, 'update')
 
         try:
             self.connection.request(action=action, data=json.dumps(payload),
@@ -399,7 +400,7 @@ class RcodeZeroDriver(DNSDriver):
                                             value=e.message)
             raise e
 
-        return Record(id=None, name=name, data=data, type=type,
+        return Record(id=hashlib.md5(name + ' ' + data).hexdigest(), name=name, data=data, type=type,
                       zone=record.zone, driver=self, extra=extra)
 
     def _to_zone(self, item):
@@ -426,7 +427,7 @@ class RcodeZeroDriver(DNSDriver):
                 extra = {}
                 extra['disabled'] = record['disabled']
                 # strip domain and trailing dot from recordname
-                recordname=re.sub('.'+zone.id+'$', '', item['name'][:-1])
+                recordname = re.sub('.' + zone.id + '$', '', item['name'][:-1])
                 records.append(Record(id=hashlib.md5(recordname + ' ' + record['content']).hexdigest(),
                                       name=recordname, data=record['content'],
                                       type=item['type'], zone=zone,
@@ -448,6 +449,9 @@ class RcodeZeroDriver(DNSDriver):
         rrset['type'] = type
         rrset['changetype'] = action
         rrset['records'] = []
+        if not (extra is None or extra.get('ttl', None)is None):
+            rrset['ttl'] = extra['ttl']
+
         content = {}
         if not action == 'delete':
             content['content'] = data
@@ -458,7 +462,7 @@ class RcodeZeroDriver(DNSDriver):
         id = hashlib.md5(name + ' ' + data).hexdigest()
     # check if rrset contains more than one record. if yes we need to create an update request
         for r in cur_records:
-            if name  == r.name and r.id != id:    #  we have other records with the same name
+            if name == r.name and r.id != id:  # we have other records with the same name
                 rrset['changetype'] = 'update'
                 content = {}
                 content['content'] = r.data
