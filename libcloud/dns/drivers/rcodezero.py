@@ -324,10 +324,8 @@ class RcodeZeroDriver(DNSDriver):
             if e.code == httplib.NOT_FOUND:
                 raise ZoneDoesNotExistError(zone_id=zone_id, driver=self,
                                             value=e.message)
-            print e.code
             raise e
 
-        print(response.object)
         return self._to_zone(response.object)
 
     def list_records(self, zone):
@@ -458,7 +456,6 @@ class RcodeZeroDriver(DNSDriver):
             if not (extra is None or extra.get('disabled', None) is None):
                 content['disabled'] = extra['disabled']
             rrset['records'].append(content)
-        print(rrset)
         id = hashlib.md5(name + ' ' + data).hexdigest()
     # check if rrset contains more than one record. if yes we need to create an update request
         for r in cur_records:
@@ -475,5 +472,4 @@ class RcodeZeroDriver(DNSDriver):
                 rrset['records'].append(content)
         request = list()
         request.append(rrset)
-        print(request)
         return request
