@@ -19,7 +19,7 @@ import json
 from libcloud.utils.py3 import httplib
 
 from libcloud.dns.base import Record, Zone
-from libcloud.dns.drivers.rcodezero import RcodeZeroDriver
+from libcloud.dns.drivers.rcodezero import RcodeZeroDNSDriver
 from libcloud.dns.types import ZoneDoesNotExistError, ZoneAlreadyExistsError
 from libcloud.dns.types import RecordType
 
@@ -27,12 +27,12 @@ from libcloud.test import LibcloudTestCase, MockHttp
 from libcloud.test.file_fixtures import DNSFileFixtures
 
 
-class RcodeZeroTestCase(LibcloudTestCase):
+class RcodeZeroDNSTestCase(LibcloudTestCase):
 
     def setUp(self):
-        RcodeZeroDriver.connectionCls.conn_class = RcodeZeroMockHttp
-        RcodeZeroMockHttp.type = None
-        self.driver = RcodeZeroDriver('mysecret')
+        RcodeZeroDNSDriver.connectionCls.conn_class = RcodeZeroDNSMockHttp
+        RcodeZeroDNSMockHttp.type = None
+        self.driver = RcodeZeroDNSDriver('mysecret')
 
         self.test_zone = Zone(id='example.at', domain='example.at',
                               driver=self.driver, type='master', ttl=None,
@@ -118,23 +118,23 @@ class RcodeZeroTestCase(LibcloudTestCase):
 #    # Test some error conditions
 
     def test_create_existing_zone(self):
-        RcodeZeroMockHttp.type = 'EXISTS'
+        RcodeZeroDNSMockHttp.type = 'EXISTS'
         extra = {'masters': ['193.0.2.2']}
         with self.assertRaises(ZoneAlreadyExistsError):
             self.driver.create_zone(
                 "example1.at", type='slave', extra=extra)
 
     def test_get_missing_zone(self):
-        RcodeZeroMockHttp.type = 'MISSING'
+        RcodeZeroDNSMockHttp.type = 'MISSING'
         with self.assertRaises(ZoneDoesNotExistError):
             self.driver.get_zone('example.com')
 
     def test_delete_missing_zone(self):
-        RcodeZeroMockHttp.type = 'MISSING'
+        RcodeZeroDNSMockHttp.type = 'MISSING'
         self.assertFalse(self.test_zone.delete())
 
 
-class RcodeZeroMockHttp(MockHttp):
+class RcodeZeroDNSMockHttp(MockHttp):
     fixtures = DNSFileFixtures('rcodezero')
     base_headers = {'content-type': 'application/json'}
 
