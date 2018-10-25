@@ -156,7 +156,7 @@ class RcodeZeroDNSDriver(DNSDriver):
         :type  data: ``str``
 
         :param extra: Extra attributes: ttl and disabled
-        tpye   extra: ``dict``
+        :type   extra: ``dict``
 
         :rtype: :class:`Record`
         """
