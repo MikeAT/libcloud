@@ -458,10 +458,14 @@ class RcodeZeroDriver(DNSDriver):
             if not (extra is None or extra.get('disabled', None) is None):
                 content['disabled'] = extra['disabled']
             rrset['records'].append(content)
-
+        print(rrset)
         id = hashlib.md5(name + ' ' + data).hexdigest()
     # check if rrset contains more than one record. if yes we need to create an update request
         for r in cur_records:
+            if action == 'update' and r.id == record.id:
+                # do not include records which should be updated in the update request
+                continue
+
             if name == r.name and r.id != id:  # we have other records with the same name
                 rrset['changetype'] = 'update'
                 content = {}
@@ -471,4 +475,5 @@ class RcodeZeroDriver(DNSDriver):
                 rrset['records'].append(content)
         request = list()
         request.append(rrset)
+        print(request)
         return request
