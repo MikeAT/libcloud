@@ -28,7 +28,7 @@ from libcloud.dns.types import Provider, RecordType
 from libcloud.utils.py3 import httplib
 
 __all__ = [
-    'RcodeZeroDriver',
+    'RcodeZeroDNSDriver',
 ]
 
 
@@ -68,7 +68,7 @@ class RcodeZeroConnection(ConnectionKey):
         return headers
 
 
-class RcodeZeroDriver(DNSDriver):
+class RcodeZeroDNSDriver(DNSDriver):
     type = Provider.RCODEZERO
     name = 'RcodeZero'
     website = 'https://www.rcodezero.at/'
@@ -134,9 +134,9 @@ class RcodeZeroDriver(DNSDriver):
             raise NotImplementedError('Unsupported API version: %s' %
                                       api_version)
 
-        super(RcodeZeroDriver, self).__init__(key=key, secure=secure,
-                                              host=host, port=port,
-                                              **kwargs)
+        super(RcodeZeroDNSDriver, self).__init__(key=key, secure=secure,
+                                                 host=host, port=port,
+                                                 **kwargs)
 
     def create_record(self, name, zone, type, data, extra=None):
         """
