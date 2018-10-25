@@ -475,4 +475,5 @@ class RcodeZeroDriver(DNSDriver):
                 rrset['records'].append(content)
         request = list()
         request.append(rrset)
+        print(request)
         return request
