@@ -43,6 +43,7 @@ class RcodeZeroResponse(JsonResponse):
             raise InvalidCredsError(
                 'Invalid API key. Check https://my.rcodezero.at/enableapi')
 
+        errors = []
         try:
             body = self.parse_body()
         except MalformedResponseError:
@@ -174,10 +175,15 @@ class RcodeZeroDriver(DNSDriver):
                 raise ZoneDoesNotExistError(zone_id=zone.id, driver=self,
                                             value=e.message)
             raise e
-        return Record(id=None, name=name, data=data,
-                      type=type, zone=zone, driver=self)
 
-    def create_zone(self, domain, type=None, ttl=None, extra={}):
+        if not (extra is None or extra.get('ttl', None) is None):
+            ttl = extra['ttl']
+        else:
+            ttl = None
+        return Record(id=None, name=name, data=data,
+                      type=type, zone=zone, ttl=ttl, driver=self)
+
+    def create_zone(self, domain, type='master', ttl=None, extra={}):
         """
         Create a new zone.
 
@@ -212,11 +218,12 @@ class RcodeZeroDriver(DNSDriver):
         except BaseHTTPError:
             e = sys.exc_info()[1]
             if e.code == httplib.UNPROCESSABLE_ENTITY and \
-               e.message.startswith("Domain '%s' already exists" % domain):
+               e.message.find("Zone '%s' already configured for your account"
+                              % domain):
                 raise ZoneAlreadyExistsError(zone_id=zone_id, driver=self,
                                              value=e.message)
             raise e
-        return Zone(id=zone_id, domain=domain, type=None, ttl=None,
+        return Zone(id=zone_id, domain=domain, type=type.lower(), ttl=None,
                     driver=self, extra=extra)
 
     def update_zone(self, zone, domain, type=None, ttl=None, extra=None):
@@ -244,6 +251,9 @@ class RcodeZeroDriver(DNSDriver):
         :rtype: :class:`Zone`
         """
         action = '%s/zones/%s' % (self.api_root, domain)
+        if type is None:
+            type = zone.type
+
         if type.lower() == 'slave' and (extra is None or
                                         extra.get('masters', None) is None):
             msg = 'Master IPs required for slave zones'
@@ -403,10 +413,14 @@ class RcodeZeroDriver(DNSDriver):
                 raise ZoneDoesNotExistError(zone_id=record.zone.id,
                                             driver=self, value=e.message)
             raise e
+        if not (extra is None or extra.get('ttl', None) is None):
+            ttl = extra['ttl']
+        else:
+            ttl = record.ttl
 
         return Record(id=hashlib.md5(name + ' ' + data).hexdigest(), name=name,
                       data=data, type=type, zone=record.zone, driver=self,
-                      extra=extra)
+                      ttl=ttl, extra=extra)
 
     def _to_zone(self, item):
         extra = {}
@@ -417,7 +431,8 @@ class RcodeZeroDriver(DNSDriver):
             if e in item:
                 extra[e] = item[e]
         return Zone(id=item['domain'], domain=item['domain'],
-                    type=item['type'], ttl=None, driver=self, extra=extra)
+                    type=item['type'].lower(), ttl=None, driver=self,
+                    extra=extra)
 
     def _to_zones(self, items):
         zones = []
@@ -457,7 +472,7 @@ class RcodeZeroDriver(DNSDriver):
         rrset['type'] = type
         rrset['changetype'] = action
         rrset['records'] = []
-        if not (extra is None or extra.get('ttl', None)is None):
+        if not (extra is None or extra.get('ttl', None) is None):
             rrset['ttl'] = extra['ttl']
 
         content = {}
