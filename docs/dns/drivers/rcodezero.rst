@@ -1,7 +1,12 @@
 RcodeZero Driver Documentation
 ==============================
 
-`RcodeZero` is a European Anycast DNS service provided by nic.at. 
+.. figure:: /_static/images/provider_logos/rcodezero.png
+    :align: center
+    :width: 300
+    :target: https://www.rcodezero.at/en
+
+`RcodeZero`_ is a European Anycast DNS service provided by nic.at. 
 
 Nameservers are arranged in two seperate clouds of more than 35 nodes.
 RcodeZero supports primary as well as secondary DNS, DNSSEC signing,
