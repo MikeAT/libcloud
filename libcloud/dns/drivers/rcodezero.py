@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-RcodeZero Driver
+RcodeZero DNS Driver
 """
 import json
 import sys
@@ -70,7 +70,7 @@ class RcodeZeroConnection(ConnectionKey):
 
 class RcodeZeroDNSDriver(DNSDriver):
     type = Provider.RCODEZERO
-    name = 'RcodeZero'
+    name = 'RcodeZero DNS'
     website = 'https://www.rcodezero.at/'
     connectionCls = RcodeZeroConnection
 
@@ -196,9 +196,8 @@ class RcodeZeroDNSDriver(DNSDriver):
         :param ttl: TTL for new records. (optional). Ignored by RcodeZEro
         :type  ttl: ``int``
 
-        :param extra: Extra attributes (driver specific).
-                      For example, specify
-                      ``extra={'masters': ['193.0.2.2','2001:db8::2']}`` to set
+        :param extra: Extra attributes: masters (for type=slave)
+                     ``extra={'masters': ['193.0.2.2','2001:db8::2']}`` sets
                       the Master nameservers for a type=slave zone.
         :type extra: ``dict``
 
@@ -242,10 +241,9 @@ class RcodeZeroDNSDriver(DNSDriver):
         :param ttl: not supported. RcodeZero support TTLs per RRSet
         :type  ttl: ``int``
 
-        :param extra: Extra attributes. (optional)
-                      For example, specify
-                      ``extra=eval('{'masters':['193.0.2.2','2001:db8::2']}')``
-                      to set the Master nameservers for a type=slave zone.
+        :param extra: Extra attributes: masters (for type=slave)
+                     ``extra={'masters': ['193.0.2.2','2001:db8::2']}`` sets
+                      the Master nameservers for a type=slave zone.
         :type extra: ``dict``
 
         :rtype: :class:`Zone`
