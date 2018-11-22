@@ -10,7 +10,7 @@ RcodeZero DNS Driver Documentation
 
 Supported Features:
 
-- more than 35 nodes in
+- more than 35 nodes
 - two seperate clouds with different ASes 
 - full IPv4/IPv6 support
 - primary as well as secondary Nameservers
@@ -18,7 +18,7 @@ Supported Features:
 - ANAME(ALIAS) records
 - extensive statistics
 - management via web interface or a REST based API
-- DDOS mitigation
+- DDoS mitigation
 - dedicated IP addresses (optional)
 
 Read more at https://www.rcodezero.at/en or get the API documentation

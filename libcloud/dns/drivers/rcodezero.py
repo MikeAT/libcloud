@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-RcodeZero DNS Driver
+    RcodeZero DNS Driver
 """
 import json
 import sys
@@ -140,22 +140,22 @@ class RcodeZeroDNSDriver(DNSDriver):
 
     def create_record(self, name, zone, type, data, extra=None):
         """
-        Create a new record.
+        Create a new record in a given, existing zone.
 
         :param name: name of the new record without the domain name,
                      for example "www".
         :type  name: ``str``
 
-        :param zone: Zone where the requested record is created.
+        :param zone: Zone in which the requested record is created.
         :type  zone: :class:`Zone`
 
-        :param type: DNS record type (A, AAAA, ...).
+        :param type: DNS resource record type (A, AAAA, ...).
         :type  type: :class:`RecordType`
 
-        :param data: Data for the record (depends on the record type).
+        :param data: Data for the record (depending on the record type).
         :type  data: ``str``
 
-        :param extra: Extra attributes: ttl and disabled
+        :param extra: Extra attributes: 'ttl', 'disabled'
         :type   extra: ``dict``
 
         :rtype: :class:`Record`
@@ -190,15 +190,16 @@ class RcodeZeroDNSDriver(DNSDriver):
         :param name: Zone domain name (e.g. example.com)
         :type  name: ``str``
 
-        :param domain: Zone type (master / slave). (required).
+        :param domain: Zone type ('master' / 'slave'). (required).
         :type  domain: :class:`Zone`
 
-        :param ttl: TTL for new records. (optional). Ignored by RcodeZEro
+        :param ttl: TTL for new records. (optional). Ignored by RcodeZero.
+                    RcodeZero uses record specific TTLs.
         :type  ttl: ``int``
 
-        :param extra: Extra attributes: masters (for type=slave)
-                     ``extra={'masters': ['193.0.2.2','2001:db8::2']}`` sets
-                      the Master nameservers for a type=slave zone.
+        :param extra: Extra attributes: 'masters' (for type=slave):
+                    ``extra={'masters': ['193.0.2.2','2001:db8::2']}``
+                    sets the Master nameservers for a type=slave zone.
         :type extra: ``dict``
 
         :rtype: :class:`Zone`
@@ -235,15 +236,15 @@ class RcodeZeroDNSDriver(DNSDriver):
         :param domain: Zone domain name (e.g. example.com)
         :type  domain: ``str``
 
-        :param type: Zone type (master / slave).
+        :param type: Zone type ('master' / 'slave').
         :type  type: ``str``
 
-        :param ttl: not supported. RcodeZero support TTLs per RRSet
+        :param ttl: not supported. RcodeZero uses RRSet-specific TTLs
         :type  ttl: ``int``
 
-        :param extra: Extra attributes: masters (for type=slave)
-                     ``extra={'masters': ['193.0.2.2','2001:db8::2']}`` sets
-                      the Master nameservers for a type=slave zone.
+        :param extra: Extra attributes: 'masters' (for type=slave)
+                     ``extra={'masters': ['193.0.2.2','2001:db8::2']}``
+                     sets the Master nameserver addresses for a type=slave zone.
         :type extra: ``dict``
 
         :rtype: :class:`Zone`
@@ -274,7 +275,7 @@ class RcodeZeroDNSDriver(DNSDriver):
 
     def delete_record(self, record):
         """
-        Use this method to delete a record.
+        Delete a record in a given zone.
 
         :param record: record to delete (record object)
         :type record: `Record`
@@ -304,7 +305,7 @@ class RcodeZeroDNSDriver(DNSDriver):
 
     def delete_zone(self, zone):
         """
-        Deletes a zone.
+        Delete a zone and all its records.
 
         :param zone: zone to delete
         :type zone: `Zone`
@@ -321,14 +322,14 @@ class RcodeZeroDNSDriver(DNSDriver):
 
     def get_zone(self, zone_id):
         """
-        Return a Zone instance.
+        Get a Zone object.
 
-        :param zone_id: name of the required zone for
+        :param zone_id: name of the zone, for
                         example "example.com".
         :type  zone_id: ``str``
 
         :rtype: :class:`Zone`
-        :raises: ZoneDoesNotExistError: If no zone could be found.
+        :raises: ZoneDoesNotExistError: if zone could not be found.
         """
         action = '%s/zones/%s' % (self.api_root, zone_id)
         try:
@@ -344,9 +345,9 @@ class RcodeZeroDNSDriver(DNSDriver):
 
     def list_records(self, zone):
         """
-        Return a list of all records for the provided zone.
+        Return a list of all record objects for the given zone.
 
-        :param zone: Zone to list records for.
+        :param zone: Zone object to list records for.
         :type zone: :class:`Zone`
 
         :return: ``list`` of :class:`Record`
@@ -365,7 +366,7 @@ class RcodeZeroDNSDriver(DNSDriver):
 
     def list_zones(self):
         """
-        Return a list of zones.
+        Return a list of zone objects for this account.
 
         :return: ``list`` of :class:`Zone`
         """
@@ -377,19 +378,19 @@ class RcodeZeroDNSDriver(DNSDriver):
         """
         Update an existing record.
 
-        :param record: Record to update.
+        :param record: Record object to update.
         :type  record: :class:`Record`
 
-        :param name: nmae of the new record, for example "www".
+        :param name: name of the new record, for example "www".
         :type  name: ``str``
 
-        :param type: DNS record type (A, AAAA, ...).
+        :param type: DNS resource record type (A, AAAA, ...).
         :type  type: :class:`RecordType`
 
-        :param data: Data for the record (depends on the record type).
+        :param data: Data for the record (depending on the record type).
         :type  data: ``str``
 
-        :param extra: Extra attributes: ttl and disabled (optional)
+        :param extra: Extra attributes: 'ttl','disabled' (optional)
         :type   extra: ``dict``
 
         :rtype: :class:`Record`
