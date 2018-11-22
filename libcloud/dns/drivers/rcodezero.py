@@ -244,7 +244,7 @@ class RcodeZeroDNSDriver(DNSDriver):
 
         :param extra: Extra attributes: 'masters' (for type=slave)
                      ``extra={'masters': ['193.0.2.2','2001:db8::2']}``
-                     sets the Master nameserver addresses for a type=slave zone.
+                     sets the Master nameserver addresses for a type=slave zone
         :type extra: ``dict``
 
         :rtype: :class:`Zone`
