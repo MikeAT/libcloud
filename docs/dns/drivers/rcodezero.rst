@@ -38,6 +38,5 @@ API Docs
 
 .. autoclass:: libcloud.dns.drivers.rcodezero.RcodeZeroDNSDriver
     :members:
-    :inherited-members:
 
 .. _`RcodeZero`: https://my.rcodezero.at/en
